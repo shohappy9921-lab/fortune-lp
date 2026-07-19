@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>✨ AI占い（スマホ版）- タロット・運勢診断</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Segoe UI', sans-serif;
+            background: linear-gradient(160deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #fff;
+            /* 下部ナビの高さぶん余白を確保 */
+            padding-bottom: calc(76px + env(safe-area-inset-bottom));
+        }
+
+        /* ヘッダー */
+        header {
+            text-align: center;
+            padding: 22px 16px 16px;
+            background: rgba(0, 0, 0, 0.35);
+            border-bottom: 1px solid #9d4edd;
+        }
+
+        header h1 {
+            font-size: 1.9em;
+            background: linear-gradient(135deg, #00d4ff, #9d4edd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        header p {
+            font-size: 0.85em;
+            color: #9d4edd;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        header a {
+            display: inline-block;
+            margin-top: 8px;
+            color: #666;
+            font-size: 0.75em;
+            text-decoration: none;
+        }
+
+        /* メイン */
+        .page {
+            padding: 14px 14px 0;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(30, 30, 50, 0.85);
+            border: 1px solid #9d4edd;
+            border-radius: 16px;
+            padding: 22px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 24px rgba(157, 78, 221, 0.2);
+        }
+
+        .fortune-intro {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .fortune-intro h2 {
+            color: #00d4ff;
+            font-size: 1.35em;
+            margin-bottom: 10px;
+        }
+
+        .fortune-intro p {
+            color: #b0b0c0;
+            font-size: 0.92em;
+            line-height: 1.6;
+        }
+
+        /* タロットカード */
+        .tarot-card {
+            width: 180px;
+            height: 270px;
+            margin: 18px auto;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .tarot-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .tarot-card.flipped .tarot-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .tarot-card-front, .tarot-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 14px;
+            border: 3px solid #00d4ff;
+            font-weight: bold;
+            box-shadow: 0 0 18px rgba(0, 212, 255, 0.3);
+            overflow: hidden;
+        }
+
+        .tarot-card-front {
+            background: linear-gradient(135deg, #533483 0%, #1a1a2e 50%, #533483 100%);
+            color: #00d4ff;
+        }
+
+        .card-emblem { font-size: 48px; line-height: 1; }
+        .card-label { font-size: 14px; letter-spacing: 4px; color: #00d4ff; }
+        .card-stars { font-size: 12px; color: #9d4edd; letter-spacing: 5px; }
+
+        .tarot-card-back {
+            background: #1a1a2e;
+            transform: rotateY(180deg);
+            padding: 0;
+        }
+
+        .tarot-card-back img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tarot-card-back img.reversed {
+            transform: rotate(180deg);
+        }
+
+        .card-name-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 26, 46, 0.9);
+            color: #00d4ff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            white-space: nowrap;
+            border: 1px solid #9d4edd;
+        }
+
+        /* ボタン */
+        .btn-fortune {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.05em;
+            font-weight: bold;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            margin: 12px 0;
+            color: white;
+            background: linear-gradient(135deg, #9d4edd 0%, #00d4ff 100%);
+            box-shadow: 0 4px 16px rgba(157, 78, 221, 0.4);
+        }
+
+        .btn-fortune:active {
+            transform: scale(0.98);
+        }
+
+        .btn-cta {
+            background: linear-gradient(135deg, #9d4edd 0%, #533483 100%);
+            color: #00d4ff;
+            padding: 12px 20px;
+            border: 1px solid #00d4ff;
+            border-radius: 14px;
+            font-size: 0.95em;
+            cursor: pointer;
+            margin: 8px 4px;
+            font-weight: bold;
+        }
+
+        .btn-cta:active {
+            transform: scale(0.97);
+        }
+
+        /* 入力 */
+        label {
+            color: #9d4edd;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.92em;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 13px 12px;
+            border-radius: 10px;
+            border: 1px solid #9d4edd;
+            background: rgba(157, 78, 221, 0.1);
+            color: #00d4ff;
+            font-size: 16px; /* iOSの自動ズーム防止 */
+            margin-bottom: 14px;
+        }
+
+        /* 結果エリア */
+        .result-area {
+            display: none;
+            text-align: center;
+        }
+
+        .result-area.show {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-title {
+            font-size: 1.9em;
+            color: #00d4ff;
+            margin: 14px 0 6px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .result-message {
+            font-size: 0.95em;
+            color: #b0b0c0;
+            line-height: 1.75;
+            margin: 14px 0;
+            background: rgba(157, 78, 221, 0.1);
+            padding: 14px;
+            border-radius: 10px;
+            border-left: 3px solid #9d4edd;
+            text-align: left;
+        }
+
+        .ai-analysis {
+            text-align: left;
+            background: rgba(0, 212, 255, 0.05);
+            padding: 14px;
+            border-radius: 10px;
+            margin: 12px 0;
+            border-left: 3px solid #00d4ff;
+            font-size: 0.92em;
+            line-height: 1.7;
+            color: #b0b0c0;
+        }
+
+        .ai-label {
+            color: #00d4ff;
+            font-weight: bold;
+            font-size: 0.88em;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        /* 正逆の意味（スマホは縦積み） */
+        .meaning-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 14px 0;
+        }
+
+        .meaning-box {
+            padding: 14px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 0.92em;
+            line-height: 1.65;
+            color: #b0b0c0;
+        }
+
+        /* 運勢バー */
+        .luck-bar {
+            width: 100%;
+            height: 24px;
+            background: rgba(157, 78, 221, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 14px 0 8px;
+            border: 1px solid #9d4edd;
+        }
+
+        .luck-fill {
+            height: 100%;
+            width: var(--luck, 0%);
+            background: linear-gradient(90deg, #9d4edd, #00d4ff);
+            border-radius: 12px;
+            transition: width 1.2s ease-out;
+        }
+
+        /* カテゴリ別運勢（スマホは1列） */
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 14px 0;
+        }
+
+        .category-box {
+            padding: 13px;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .category-box .cat-label { font-size: 0.85em; margin-bottom: 3px; }
+        .category-box .cat-stars { font-size: 1.35em; font-weight: bold; }
+        .category-box .cat-comment { color: #b0b0c0; font-size: 0.85em; line-height: 1.6; margin-top: 6px; }
+
+        /* ラッキーポイント */
+        .lucky-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .lucky-box {
+            background: rgba(0, 212, 255, 0.08);
+            padding: 12px 6px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            text-align: center;
+        }
+
+        .lucky-box .lucky-label { color: #9d4edd; font-size: 0.7em; margin-bottom: 6px; }
+        .lucky-box .lucky-value { color: #00d4ff; font-size: 0.95em; font-weight: bold; }
+
+        /* 運命タイプ */
+        .type-box {
+            background: rgba(157, 78, 221, 0.15);
+            border: 1px solid #9d4edd;
+            border-radius: 14px;
+            padding: 18px 14px;
+            margin-bottom: 18px;
+        }
+
+        /* 下部固定ナビ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            background: rgba(20, 20, 40, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid #9d4edd;
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 100;
+        }
+
+        .tab-btn {
+            padding: 12px 4px 10px;
+            border: none;
+            background: transparent;
+            color: #777;
+            cursor: pointer;
+            font-size: 0.78em;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tab-btn .nav-icon {
+            font-size: 1.7em;
+            line-height: 1;
+        }
+
+        .tab-btn.active {
+            color: #00d4ff;
+        }
+
+        .tab-btn.active .nav-icon {
+            filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.8));
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header>
+        <h1>✨ AI占い ✨</h1>
+        <p>最先端のAIが解き明かす、あなたの運命</p>
+        <a href="index.html">💻 PC版はこちら</a>
+    </header>
+
+    <div class="page">
+        <!-- タロット占いセクション -->
+        <div id="tarot-section" class="tab-section">
+            <div class="card">
+                <div class="fortune-intro">
+                    <h2>🎴 タロット占い</h2>
+                    <p>全78枚のタロットカードから1枚を引き、正位置・逆位置まで深く解き明かします</p>
+                </div>
+
+                <div class="tarot-card" id="tarotCard" onclick="showTarot()">
+                    <div class="tarot-card-inner">
+                        <div class="tarot-card-front">
+                            <div class="card-stars">✦ ✦ ✦</div>
+                            <div class="card-emblem">🔮</div>
+                            <div class="card-label">TAROT</div>
+                            <div class="card-stars">✦ ✦ ✦</div>
+                        </div>
+                        <div class="tarot-card-back">
+                            <img id="tarotImage" src="images/major_01.jpg" alt="タロットカード">
+                            <div class="card-name-badge" id="tarotRevealName">？？？</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-fortune" onclick="showTarot()">🎯 カードをめくる</button>
+
+                <div class="result-area" id="tarotResult">
+                    <div class="result-title" id="tarotCardName">魔術師</div>
+                    <p style="color: #9d4edd; font-size: 0.9em; margin-bottom: 10px;" id="tarotKeyword">I. The Magician</p>
+                    <p id="tarotPosition" style="display: inline-block; padding: 4px 16px; border: 1px solid #00d4ff; border-radius: 18px; font-size: 0.9em; font-weight: bold; color: #00d4ff; background: rgba(0, 212, 255, 0.12); margin-bottom: 10px;">正位置</p>
+
+                    <div class="result-message" id="tarotCardMeaning"></div>
+
+                    <div class="meaning-grid">
+                        <div class="meaning-box" style="background: rgba(0, 212, 255, 0.1); border-left: 3px solid #00d4ff;">
+                            <div class="ai-label" style="color: #00d4ff;">☀️ 正位置の意味</div>
+                            <div id="tarotPositive"></div>
+                        </div>
+                        <div class="meaning-box" style="background: rgba(157, 78, 221, 0.1); border-left: 3px solid #9d4edd;">
+                            <div class="ai-label" style="color: #9d4edd;">🌙 逆位置の意味</div>
+                            <div id="tarotNegative"></div>
+                        </div>
+                    </div>
+
+                    <div class="ai-analysis">
+                        <div class="ai-label">💡 アドバイス</div>
+                        <div id="tarotAdvice"></div>
+                    </div>
+
+                    <div class="ai-analysis">
+                        <div class="ai-label">🤖 AI深層分析</div>
+                        <div id="tarotAiAnalysis"></div>
+                    </div>
+
+                    <button class="btn-cta" onclick="showTarot()">🔄 別のカードを引く</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 運勢診断セクション -->
+        <div id="fortune-section" class="tab-section" style="display: none;">
+            <div class="card">
+                <div class="fortune-intro">
+                    <h2>🔮 今日の運勢診断</h2>
+                    <p>生年月日からAIがあなたの「運命タイプ」を判定し、今日の運勢を診断します</p>
+                    <p style="margin-top: 8px; font-size: 0.72em; color: #777;">※本診断はオリジナルの占いロジックによるものです</p>
+                </div>
+
+                <label>あなたの生年月日</label>
+                <input type="date" id="fortuneBirthDate">
+
+                <button class="btn-fortune" onclick="showFortune()">🎯 運勢を診断する</button>
+
+                <div class="result-area" id="fortuneResult">
+                    <div class="type-box">
+                        <p style="color: #9d4edd; font-size: 0.8em; letter-spacing: 2px; margin-bottom: 6px;">🌟 あなたの運命タイプ</p>
+                        <p style="color: #00d4ff; font-size: 1.6em; font-weight: bold;" id="typeName">金の太陽座</p>
+                        <p style="color: #fff; font-size: 0.95em; margin: 6px 0 14px;" id="typeCatch">〜情熱のリーダー〜</p>
+
+                        <div class="ai-analysis">
+                            <div class="ai-label">👤 あなたの性格</div>
+                            <div id="typePersonality"></div>
+                        </div>
+
+                        <div class="ai-analysis">
+                            <div class="ai-label">⚡ エネルギーの流れ</div>
+                            <div id="typeStyle"></div>
+                        </div>
+
+                        <div class="ai-analysis">
+                            <div class="ai-label">🗓️ 2026年のあなたの運勢</div>
+                            <div id="typeYear"></div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #9d4edd; letter-spacing: 2px; margin-bottom: 2px; font-size: 1em;">📅 今日の運勢</h3>
+                    <div class="result-title" id="fortuneTitle">大吉</div>
+
+                    <p style="color: #b0b0c0; font-size: 0.85em; margin-bottom: 4px;">総合運勢スコア</p>
+                    <div class="luck-bar">
+                        <div class="luck-fill" id="fortuneLuckFill"></div>
+                    </div>
+                    <p style="color: #9d4edd; font-size: 1.4em; font-weight: bold;" id="fortuneScore">95/100</p>
+
+                    <div class="category-grid">
+                        <div class="category-box" style="background: rgba(157, 78, 221, 0.2); border-left: 3px solid #9d4edd;">
+                            <p class="cat-label" style="color: #9d4edd;">💼 仕事運</p>
+                            <p class="cat-stars" style="color: #00d4ff;" id="workLuck">⭐⭐⭐</p>
+                            <p class="cat-comment" id="workComment"></p>
+                        </div>
+                        <div class="category-box" style="background: rgba(0, 212, 255, 0.15); border-left: 3px solid #00d4ff;">
+                            <p class="cat-label" style="color: #00d4ff;">💕 恋愛運</p>
+                            <p class="cat-stars" style="color: #9d4edd;" id="loveLuck">⭐⭐⭐</p>
+                            <p class="cat-comment" id="loveComment"></p>
+                        </div>
+                        <div class="category-box" style="background: rgba(157, 78, 221, 0.2); border-left: 3px solid #9d4edd;">
+                            <p class="cat-label" style="color: #9d4edd;">💰 金運</p>
+                            <p class="cat-stars" style="color: #00d4ff;" id="moneyLuck">⭐⭐⭐</p>
+                            <p class="cat-comment" id="moneyComment"></p>
+                        </div>
+                        <div class="category-box" style="background: rgba(0, 212, 255, 0.15); border-left: 3px solid #00d4ff;">
+                            <p class="cat-label" style="color: #00d4ff;">💪 健康運</p>
+                            <p class="cat-stars" style="color: #9d4edd;" id="healthLuck">⭐⭐⭐</p>
+                            <p class="cat-comment" id="healthComment"></p>
+                        </div>
+                    </div>
+
+                    <div class="result-message" id="fortuneMessage"></div>
+
+                    <h3 style="color: #00d4ff; margin: 14px 0 4px; font-size: 1em;">🍀 今日のラッキーポイント</h3>
+                    <div class="lucky-grid">
+                        <div class="lucky-box">
+                            <p class="lucky-label">🎨 カラー</p>
+                            <p class="lucky-value" id="luckyColor">ゴールド</p>
+                        </div>
+                        <div class="lucky-box" style="background: rgba(157, 78, 221, 0.08); border-color: rgba(157, 78, 221, 0.3);">
+                            <p class="lucky-label">🔑 アイテム</p>
+                            <p class="lucky-value" id="luckyItem">腕時計</p>
+                        </div>
+                        <div class="lucky-box">
+                            <p class="lucky-label">🔢 ナンバー</p>
+                            <p class="lucky-value" id="luckyNumber">7</p>
+                        </div>
+                    </div>
+
+                    <div class="ai-analysis">
+                        <div class="ai-label">💡 今日の行動アドバイス</div>
+                        <div id="fortuneAdvice"></div>
+                    </div>
+
+                    <div class="ai-analysis">
+                        <div class="ai-label">🤖 AI詳細分析</div>
+                        <div id="fortuneAiAnalysis"></div>
+                    </div>
+
+                    <div class="ai-analysis">
+                        <div class="ai-label">⚠️ 今日の注意点</div>
+                        <div id="fortuneCaution"></div>
+                    </div>
+
+                    <button class="btn-cta" onclick="showFortune()">🔄 もう一度診断する</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 相性診断セクション -->
+        <div id="love-section" class="tab-section" style="display: none;">
+            <div class="card">
+                <div class="fortune-intro">
+                    <h2>💕 相性診断</h2>
+                    <p>生年月日からAIが分析する、あなたの相性診断</p>
+                </div>
+
+                <label>あなたの生年月日</label>
+                <input type="date" id="birthDate1">
+
+                <label>相手の生年月日</label>
+                <input type="date" id="birthDate2">
+
+                <button class="btn-fortune" onclick="showCompatibility()">💕 相性を診断</button>
+
+                <div class="result-area" id="compatibilityResult">
+                    <p style="font-size: 2.4em; margin: 12px 0;">💑</p>
+                    <div class="result-title" id="compatibilityTitle">相性度: 85%</div>
+
+                    <div class="luck-bar">
+                        <div class="luck-fill" id="compatibilityFill"></div>
+                    </div>
+
+                    <div class="ai-analysis">
+                        <div class="ai-label">🤖 AI相性分析</div>
+                        <div id="compatibilityAiAnalysis"></div>
+                    </div>
+
+                    <button class="btn-cta" onclick="showCompatibility()">🔄 別の人と診断</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 下部固定ナビ -->
+    <nav class="bottom-nav">
+        <button class="tab-btn active" onclick="switchTab('tarot')"><span class="nav-icon">🎴</span>タロット</button>
+        <button class="tab-btn" onclick="switchTab('fortune')"><span class="nav-icon">🔮</span>運勢診断</button>
+        <button class="tab-btn" onclick="switchTab('love')"><span class="nav-icon">💕</span>相性診断</button>
+    </nav>
+
+    <script src="tarot-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
