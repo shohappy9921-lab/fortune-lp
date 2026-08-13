@@ -315,6 +315,32 @@
             box-shadow: 8px 8px 0 rgba(74, 59, 92, 0.25);
         }
 
+        .btn-fortune:disabled {
+            opacity: 0.45;
+            cursor: default;
+            filter: grayscale(0.4);
+        }
+
+        .btn-fortune:disabled:hover {
+            transform: none;
+            box-shadow: 6px 6px 0 rgba(255, 79, 168, 0.45);
+        }
+
+        .next-draw {
+            margin-top: 22px;
+            padding-top: 18px;
+            text-align: center;
+            border-top: 2px dashed #ff8ecb;
+            color: #ff6fc1;
+            font-size: 0.9em;
+            font-weight: bold;
+            line-height: 1.9;
+        }
+
+        .next-draw b {
+            color: #3ec9d5;
+        }
+
         .btn-fortune:active {
             transform: translateY(2px);
             box-shadow: 2px 2px 0 rgba(74, 59, 92, 0.25);
@@ -552,7 +578,7 @@
                     </div>
                 </div>
 
-                <button class="btn-fortune" onclick="showTarot()">🎯 カードをめくる</button>
+                <button class="btn-fortune" id="tarotDrawBtn" onclick="showTarot()">🎯 カードをめくる</button>
 
                 <div class="result-area" id="tarotResult">
                     <div class="result-title" id="tarotCardName">魔術師</div>
@@ -592,9 +618,7 @@
                         </div>
                     </div>
 
-                    <div class="cta-section">
-                        <button class="btn-cta" onclick="showTarot()">🔄 別のカードを引く</button>
-                    </div>
+                    <p class="next-draw" id="tarotNextDraw"></p>
                 </div>
             </div>
         </div>
@@ -899,35 +923,62 @@
             return suitText + ' ' + posText;
         }
 
-        function showTarot() {
-            if (typeof tarotCards === 'undefined') {
-                alert('カードデータの読み込みに失敗しました。ページを再読み込みしてください。');
-                return;
+        /* ===== タロットは一日一回（0時を過ぎると再び引ける） ===== */
+        const TAROT_STORE_KEY = 'pop_tarot_draw';
+
+        function tarotTodayKey() {
+            const d = new Date();
+            return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        }
+
+        function loadTodaysDraw() {
+            try {
+                const raw = localStorage.getItem(TAROT_STORE_KEY);
+                if (!raw) return null;
+                const saved = JSON.parse(raw);
+                if (saved.day !== tarotTodayKey()) return null;
+                if (typeof saved.index !== 'number') return null;
+                if (!tarotCards || !tarotCards[saved.index]) return null;
+                return saved;
+            } catch (e) { return null; }
+        }
+
+        function saveTodaysDraw(index, reversed) {
+            try {
+                localStorage.setItem(TAROT_STORE_KEY, JSON.stringify({ day: tarotTodayKey(), index: index, reversed: reversed }));
+            } catch (e) { /* 保存できなくても占い自体は動かす */ }
+        }
+
+        function updateNextDrawNote() {
+            const el = document.getElementById('tarotNextDraw');
+            if (!el) return;
+            const now = new Date();
+            const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+            const diff = next - now;
+            if (diff <= 0) { location.reload(); return; }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            el.innerHTML = '今日のカードは、すでに引き終えています。<br>次の一枚は日付が変わってから。<b>あと' + h + '時間' + m + '分</b>';
+        }
+
+        function lockTarot() {
+            const btn = document.getElementById('tarotDrawBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '本日は引き終えています';
             }
-            const card = tarotCards[Math.floor(Math.random() * tarotCards.length)];
-            const reversed = Math.random() < 0.5;
-            const posLabel = reversed ? '逆位置' : '正位置';
             const cardEl = document.getElementById('tarotCard');
-
-            // フリップが見えるように、まずカードまでスクロール
-            cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            const revealCard = () => {
-                const img = document.getElementById('tarotImage');
-                img.src = card.image;
-                img.classList.toggle('reversed', reversed);
-                document.getElementById('tarotRevealName').textContent = card.name + '（' + posLabel + '）';
-                cardEl.classList.add('flipped');
-            };
-
-            // 2回目以降は一度裏に戻してからめくり直す
-            if (cardEl.classList.contains('flipped')) {
-                cardEl.classList.remove('flipped');
-                setTimeout(revealCard, 600);
-            } else {
-                setTimeout(revealCard, 400);
+            if (cardEl) {
+                cardEl.onclick = null;
+                cardEl.style.cursor = 'default';
             }
+            updateNextDrawNote();
+            clearInterval(window.__tarotTimer);
+            window.__tarotTimer = setInterval(updateNextDrawNote, 60000);
+        }
 
+        function renderTarot(card, reversed) {
+            const posLabel = reversed ? '逆位置' : '正位置';
             document.getElementById('tarotCardName').textContent = card.name;
             document.getElementById('tarotKeyword').textContent = card.keyword;
 
@@ -943,8 +994,57 @@
             document.getElementById('tarotAdvice').textContent = reversed ? card.revA : card.upA;
             document.getElementById('tarotAiAnalysis').textContent = buildTarotAnalysis(card, reversed);
             document.getElementById('tarotResult').classList.add('show');
+
+            const img = document.getElementById('tarotImage');
+            img.src = card.image;
+            img.classList.toggle('reversed', reversed);
+            document.getElementById('tarotRevealName').textContent = card.name + '（' + posLabel + '）';
+        }
+
+        function showTarot() {
+            if (typeof tarotCards === 'undefined') {
+                alert('カードデータの読み込みに失敗しました。ページを再読み込みしてください。');
+                return;
+            }
+            if (loadTodaysDraw()) {
+                lockTarot();
+                return;
+            }
+
+            const index = Math.floor(Math.random() * tarotCards.length);
+            const card = tarotCards[index];
+            const reversed = Math.random() < 0.5;
+            const cardEl = document.getElementById('tarotCard');
+
+            saveTodaysDraw(index, reversed);
+
+            // フリップが見えるように、まずカードまでスクロール
+            cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            const revealCard = () => {
+                renderTarot(card, reversed);
+                cardEl.classList.add('flipped');
+            };
+
+            // 2回目以降は一度裏に戻してからめくり直す
+            if (cardEl.classList.contains('flipped')) {
+                cardEl.classList.remove('flipped');
+                setTimeout(revealCard, 600);
+            } else {
+                setTimeout(revealCard, 400);
+            }
+
+            lockTarot();
             // フリップアニメーションを見せてから結果へスクロール
             setTimeout(() => document.getElementById('tarotResult').scrollIntoView({ behavior: 'smooth', block: 'start' }), 2000);
+        }
+
+        function restoreTarot() {
+            const saved = loadTodaysDraw();
+            if (!saved) return;
+            renderTarot(tarotCards[saved.index], saved.reversed);
+            document.getElementById('tarotCard').classList.add('flipped');
+            lockTarot();
         }
 
         // 運命タイプデータ（オリジナル診断ロジック）
@@ -1067,6 +1167,13 @@
             document.getElementById('compatibilityAiAnalysis').textContent = analyses[Math.floor(Math.random() * analyses.length)];
             document.getElementById('compatibilityResult').classList.add('show');
             setTimeout(() => document.getElementById('compatibilityResult').scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        }
+
+        /* ===== 初期表示：本日すでに引いていれば復元 ===== */
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', restoreTarot);
+        } else {
+            restoreTarot();
         }
     </script>
 </body>

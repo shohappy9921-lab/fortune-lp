@@ -199,6 +199,30 @@
             transform: scale(0.98);
         }
 
+        .btn-fortune:disabled {
+            opacity: 0.45;
+            cursor: default;
+            filter: grayscale(0.35);
+        }
+
+        .btn-fortune:disabled:active {
+            transform: none;
+        }
+
+        .next-draw {
+            margin-top: 18px;
+            padding-top: 14px;
+            text-align: center;
+            border-top: 1px solid rgba(157, 78, 221, 0.25);
+            color: #9d4edd;
+            font-size: 0.85em;
+            line-height: 1.8;
+        }
+
+        .next-draw b {
+            color: #00d4ff;
+        }
+
         .btn-cta {
             background: linear-gradient(135deg, #9d4edd 0%, #533483 100%);
             color: #00d4ff;
@@ -459,7 +483,7 @@
                     </div>
                 </div>
 
-                <button class="btn-fortune" onclick="showTarot()">🎯 カードをめくる</button>
+                <button class="btn-fortune" id="tarotDrawBtn" onclick="showTarot()">🎯 カードをめくる</button>
 
                 <div class="result-area" id="tarotResult">
                     <div class="result-title" id="tarotCardName">魔術師</div>
@@ -489,7 +513,7 @@
                         <div id="tarotAiAnalysis"></div>
                     </div>
 
-                    <button class="btn-cta" onclick="showTarot()">🔄 別のカードを引く</button>
+                    <p class="next-draw" id="tarotNextDraw"></p>
                 </div>
             </div>
         </div>
