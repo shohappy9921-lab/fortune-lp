@@ -219,6 +219,14 @@ body{
   border:1px solid rgba(212,175,55,.5);border-radius:4px;transition:.3s;
 }
 .btn-sub:hover{background:rgba(212,175,55,.1);border-color:var(--gold)}
+.next-draw{
+  margin-top:22px;padding:14px 16px;text-align:center;
+  border-top:1px solid rgba(212,175,55,.2);
+  color:var(--gold-dim);font-size:.86em;letter-spacing:.06em;line-height:1.9;
+}
+.next-draw b{color:var(--gold);font-weight:600}
+.btn-main:disabled{opacity:.45;cursor:default;filter:grayscale(.35)}
+.btn-main:disabled:hover{transform:none;box-shadow:none}
 
 /* ===== フォーム ===== */
 .field{margin:22px 0}
@@ -364,7 +372,7 @@ footer .sig{color:var(--gold-dim);font-family:'Cormorant Garamond',serif;font-st
         <p class="tap-hint">カードに触れて、心を静かに</p>
       </div>
 
-      <button class="btn-main" onclick="showTarot()">カードをめくる</button>
+      <button class="btn-main" id="tarotDrawBtn" onclick="showTarot()">カードをめくる</button>
 
       <div class="result" id="tarotResult">
         <div class="result-title" id="tarotCardName">魔術師</div>
@@ -394,7 +402,7 @@ footer .sig{color:var(--gold-dim);font-family:'Cormorant Garamond',serif;font-st
           <div class="body" id="tarotAiAnalysis">現在のあなたは、新しいことを始める最適なタイミングにあります。</div>
         </div>
 
-        <button class="btn-sub" onclick="showTarot()">もう一度カードを引く</button>
+        <p class="next-draw" id="tarotNextDraw"></p>
       </div>
     </div>
   </div>
@@ -615,35 +623,66 @@ function buildTarotAnalysis(card, reversed){
   return suitText + ' ' + posText;
 }
 
-function showTarot(){
-  if(typeof tarotCards === 'undefined'){
-    say('ごめんなさい、カードが手元に見当たらないわ。ページを読み込み直してもらえる？');
-    return;
+/* ===== タロットは一日一回（0時を過ぎると再び引ける） ===== */
+const TAROT_STORE_KEY = 'luna_tarot_draw';
+
+function todayKey(){
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+}
+
+function loadTodaysDraw(){
+  try{
+    const raw = localStorage.getItem(TAROT_STORE_KEY);
+    if(!raw) return null;
+    const saved = JSON.parse(raw);
+    if(saved.day !== todayKey()) return null;             // 日付が変わっていれば無効
+    if(typeof saved.index !== 'number') return null;
+    if(!tarotCards || !tarotCards[saved.index]) return null;
+    return saved;
+  }catch(e){ return null; }
+}
+
+function saveTodaysDraw(index, reversed){
+  try{
+    localStorage.setItem(TAROT_STORE_KEY, JSON.stringify({ day: todayKey(), index: index, reversed: reversed }));
+  }catch(e){ /* 保存できなくても占い自体は動かす */ }
+}
+
+/* 次に引けるまでの残り時間（翌0時まで） */
+function updateNextDrawNote(){
+  const el = document.getElementById('tarotNextDraw');
+  if(!el) return;
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+  const diff = next - now;
+  if(diff <= 0){ location.reload(); return; }
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  el.innerHTML = '今日のカードは、すでに開かれました。<br>次の一枚は日付が変わってから。<b>あと' + h + '時間' + m + '分</b>';
+}
+
+function lockTarot(){
+  const btn = document.getElementById('tarotDrawBtn');
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = '本日は引き終えています';
   }
-  const card = tarotCards[Math.floor(Math.random() * tarotCards.length)];
-  const reversed = Math.random() < 0.5;
-  const posLabel = reversed ? '逆位置' : '正位置';
   const cardEl = document.getElementById('tarotCard');
-
-  say('……いま、カードが動いたわ。めくるわね。');
-  cardEl.scrollIntoView({behavior:'smooth', block:'center'});
-
-  const reveal = () => {
-    const img = document.getElementById('tarotImage');
-    img.src = card.image;
-    img.classList.toggle('reversed', reversed);
-    document.getElementById('tarotRevealName').textContent = card.name + '（' + posLabel + '）';
-    cardEl.classList.add('flipped');
-    setTimeout(() => say(`出たのは《${card.name}》の${posLabel}。……なるほどね。詳しく読み解いていくわ。`), 700);
-  };
-
-  if(cardEl.classList.contains('flipped')){
-    cardEl.classList.remove('flipped');
-    setTimeout(reveal, 600);
-  }else{
-    setTimeout(reveal, 400);
+  if(cardEl){
+    cardEl.onclick = null;
+    cardEl.style.cursor = 'default';
   }
+  const hint = document.querySelector('.tap-hint');
+  if(hint) hint.textContent = '今日のカードは開かれました';
+  updateNextDrawNote();
+  clearInterval(window.__tarotTimer);
+  window.__tarotTimer = setInterval(updateNextDrawNote, 60000);
+}
 
+/* 結果欄の描画（新規に引いたときも、保存分を再表示するときも共通） */
+function renderTarot(card, reversed){
+  const posLabel = reversed ? '逆位置' : '正位置';
   document.getElementById('tarotCardName').textContent = card.name;
   document.getElementById('tarotKeyword').textContent = card.keyword;
 
@@ -659,7 +698,52 @@ function showTarot(){
   document.getElementById('tarotAdvice').textContent = reversed ? card.revA : card.upA;
   document.getElementById('tarotAiAnalysis').textContent = buildTarotAnalysis(card, reversed);
   document.getElementById('tarotResult').classList.add('show');
+
+  const img = document.getElementById('tarotImage');
+  img.src = card.image;
+  img.classList.toggle('reversed', reversed);
+  document.getElementById('tarotRevealName').textContent = card.name + '（' + posLabel + '）';
+}
+
+function showTarot(){
+  if(typeof tarotCards === 'undefined'){
+    say('ごめんなさい、カードが手元に見当たらないわ。ページを読み込み直してもらえる？');
+    return;
+  }
+  if(loadTodaysDraw()){            // 本日すでに引いている
+    lockTarot();
+    say('今日のあなたのカードは、もう開かれているわ。次の一枚は、日付が変わってからね。');
+    return;
+  }
+
+  const index = Math.floor(Math.random() * tarotCards.length);
+  const card = tarotCards[index];
+  const reversed = Math.random() < 0.5;
+  const posLabel = reversed ? '逆位置' : '正位置';
+  const cardEl = document.getElementById('tarotCard');
+
+  saveTodaysDraw(index, reversed);
+
+  say('……いま、カードが動いたわ。めくるわね。');
+  cardEl.scrollIntoView({behavior:'smooth', block:'center'});
+
+  setTimeout(() => {
+    renderTarot(card, reversed);
+    cardEl.classList.add('flipped');
+    setTimeout(() => say(`出たのは《${card.name}》の${posLabel}。……なるほどね。詳しく読み解いていくわ。`), 700);
+  }, 400);
+
+  lockTarot();
   setTimeout(() => document.getElementById('tarotResult').scrollIntoView({behavior:'smooth', block:'start'}), 2200);
+}
+
+/* 読み込み時：本日すでに引いていれば、その一枚を復元して表示 */
+function restoreTarot(){
+  const saved = loadTodaysDraw();
+  if(!saved) return;
+  renderTarot(tarotCards[saved.index], saved.reversed);
+  document.getElementById('tarotCard').classList.add('flipped');
+  lockTarot();
 }
 
 /* ===== 運勢診断 ===== */
@@ -779,6 +863,7 @@ function showCompatibility(){
 
 /* ===== 初期表示 ===== */
 say(greetings[Math.floor(Math.random() * greetings.length)]);
+restoreTarot();
 </script>
 </body>
 </html>
