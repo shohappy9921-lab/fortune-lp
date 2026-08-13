@@ -1,5 +1,6 @@
 // 本日のラッキーカラー（全ページ共通）
-// 日付から決定するため、同じ日は誰が見ても同じ色。日付が変われば色も変わります。
+// 「訪問者ごとの固有ID × 日付」で決まるため、色は人それぞれ違います。
+// 同じ人が同じ日に何度見ても色は変わらず、日付が変わると新しい色になります。
 (function () {
   const LUCKY_COLORS = [
     { name: 'ゴールド',       hex: '#d4af37', msg: '自信と豊かさを呼び込む色。ここぞという場面で身につけると、あなたの存在感が際立ちます。' },
@@ -25,13 +26,33 @@
     return Math.abs(h);
   }
 
+  // 訪問者ごとの固有ID（初回訪問時に作成し、以後ずっと同じものを使う）
+  function visitorId() {
+    const KEY = 'lucky_visitor_id';
+    try {
+      let id = localStorage.getItem(KEY);
+      if (!id) {
+        id = Math.random().toString(36).slice(2) + '-' + Date.now().toString(36);
+        localStorage.setItem(KEY, id);
+      }
+      return id;
+    } catch (e) {
+      // 保存できない環境では、その場限りのIDで動かす
+      if (!window.__luckyTempId) {
+        window.__luckyTempId = Math.random().toString(36).slice(2);
+      }
+      return window.__luckyTempId;
+    }
+  }
+
   function render() {
     const box = document.getElementById('dailyColor');
     if (!box) return;
 
     const now = new Date();
     const key = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
-    const c = LUCKY_COLORS[hashSeed(key) % LUCKY_COLORS.length];
+    // 「人」×「日付」で色を決める
+    const c = LUCKY_COLORS[hashSeed(visitorId() + '|' + key) % LUCKY_COLORS.length];
     const week = ['日', '月', '火', '水', '木', '金', '土'][now.getDay()];
     const dateText = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日（' + week + '）';
 
