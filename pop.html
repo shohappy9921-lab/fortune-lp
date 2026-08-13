@@ -13,10 +13,10 @@
 
         body {
             font-family: 'Hiragino Maru Gothic ProN', 'BIZ UDGothic', 'Yu Gothic', 'Segoe UI', sans-serif;
-            background: #ffeef7;
+            background: #1b0630;
             min-height: 100vh;
             overflow-x: hidden;
-            color: #4a3b5c;
+            color: #f3e6ff;
         }
 
         /* 背景アニメーションは固定レイヤーに分離（本文の再描画を防ぎ動作を軽くする） */
@@ -24,7 +24,11 @@
             position: fixed;
             inset: 0;
             z-index: -1;
-            background: linear-gradient(135deg, #ffd3e8 0%, #fff6b7 25%, #c1f0ff 50%, #e5d4ff 75%, #ffd3e8 100%);
+            background:
+                radial-gradient(ellipse at 18% 12%, rgba(255,79,168,.35), transparent 55%),
+                radial-gradient(ellipse at 82% 20%, rgba(62,201,213,.28), transparent 55%),
+                radial-gradient(ellipse at 50% 88%, rgba(139,92,246,.38), transparent 60%),
+                linear-gradient(135deg, #23073d 0%, #3d0f63 30%, #5b1a86 55%, #3d0f63 78%, #23073d 100%);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
             will-change: background-position;
@@ -37,12 +41,36 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* メインビジュアル */
+        .pop-hero {
+            position: relative;
+            line-height: 0;
+        }
+
+        .pop-hero img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* 画像の下端を背景へなじませる */
+        .pop-hero::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 22%;
+            background: linear-gradient(to top, #23073d 0%, rgba(35, 7, 61, .7) 45%, transparent 100%);
+            pointer-events: none;
+        }
+
         /* ヘッダー */
         header {
             text-align: center;
             padding: 60px 20px;
-            background: rgba(255, 255, 255, 0.55);
-            border-bottom: 4px dashed #ff6fae;
+            background: rgba(28, 6, 51, 0.55);
+            border-bottom: 4px dashed #ff4fa8;
         }
 
         header h1 {
@@ -60,7 +88,7 @@
 
         header p {
             font-size: 1.2em;
-            color: #ff5da2;
+            color: #ff6fc1;
             font-weight: bold;
             letter-spacing: 2px;
         }
@@ -73,14 +101,14 @@
         }
 
         /* 本日のラッキーカラー */
-        .daily-color{max-width:560px;margin:0 auto 26px;padding:18px 20px;border:1px solid #ff9ecb;border-radius:16px;background:rgba(255,255,255,.8);text-align:center}
-        .dc-date{font-size:.95em;letter-spacing:.1em;color:#9b8bae;margin-bottom:12px}
+        .daily-color{max-width:560px;margin:0 auto 26px;padding:18px 20px;border:1px solid #ff4fa8;border-radius:16px;background:rgba(48,14,82,.82);text-align:center}
+        .dc-date{font-size:.95em;letter-spacing:.1em;color:#c3a8de;margin-bottom:12px}
         .dc-main{display:flex;align-items:center;justify-content:center;gap:14px}
-        .dc-swatch{width:46px;height:46px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 3px rgba(255,255,255,.9),0 4px 14px rgba(0,0,0,.25)}
+        .dc-swatch{width:46px;height:46px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 3px rgba(255,255,255,.75),0 0 18px rgba(255,255,255,.35)}
         .dc-info{text-align:left}
         .dc-label{font-size:.95em;letter-spacing:.06em;margin-bottom:2px;color:#ff5da2}
         .dc-name{font-size:1.35em;font-weight:bold;color:#ff5da2;line-height:1.4}
-        .dc-msg{margin-top:12px;font-size:.95em;line-height:1.8;color:#6b5b7e}
+        .dc-msg{margin-top:12px;font-size:.95em;line-height:1.8;color:#e0cdf5}
         @media (max-width:600px){
             .daily-color{width:calc(100% - 4px)}
             .dc-name{font-size:1.2em}
@@ -96,37 +124,37 @@
 
         .tab-btn {
             padding: 15px 20px;
-            border: 3px solid #4a3b5c;
-            background: #fff;
-            color: #4a3b5c;
+            border: 3px solid #ff4fa8;
+            background: rgba(38, 10, 66, .85);
+            color: #ffd7f0;
             border-radius: 999px;
             cursor: pointer;
             font-size: 1em;
             font-weight: bold;
             transition: all 0.2s ease;
-            box-shadow: 4px 4px 0 rgba(74, 59, 92, 0.25);
+            box-shadow: 4px 4px 0 rgba(255, 79, 168, 0.3);
         }
 
         .tab-btn:hover {
             transform: translateY(-3px) rotate(-1deg);
-            box-shadow: 6px 6px 0 rgba(74, 59, 92, 0.25);
+            box-shadow: 6px 6px 0 rgba(255, 79, 168, 0.45);
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, #ff6fae, #ffc93d);
-            color: #fff;
-            text-shadow: 1px 1px 0 rgba(74, 59, 92, 0.3);
-            box-shadow: 4px 4px 0 rgba(255, 93, 162, 0.35);
+            background: linear-gradient(135deg, #ff4fa8, #ffd34d);
+            color: #2a0745;
+            text-shadow: none;
+            box-shadow: 0 0 22px rgba(255, 79, 168, .6), 4px 4px 0 rgba(255, 211, 77, .35);
         }
 
         /* カード */
         .card {
-            background: rgba(255, 255, 255, 0.92);
-            border: 3px solid #4a3b5c;
+            background: rgba(48, 14, 82, 0.82);
+            border: 3px solid #ff4fa8;
             border-radius: 28px;
             padding: 40px;
             margin: 20px 0;
-            box-shadow: 8px 8px 0 rgba(255, 111, 174, 0.35);
+            box-shadow: 0 0 0 1px rgba(255,255,255,.06), 8px 8px 0 rgba(255, 79, 168, 0.28), 0 0 34px rgba(139,92,246,.25);
             animation: slideUp 0.6s ease-out;
         }
 
@@ -173,16 +201,16 @@
             justify-content: center;
             gap: 12px;
             border-radius: 18px;
-            border: 4px solid #4a3b5c;
+            border: 4px solid #ff4fa8;
             font-weight: bold;
-            box-shadow: 6px 6px 0 rgba(78, 205, 196, 0.4);
+            box-shadow: 0 0 26px rgba(62,201,213,.5), 6px 6px 0 rgba(62,201,213,.35);
             overflow: hidden;
         }
 
         /* めくる前：カードの裏面デザイン */
         .tarot-card-front {
-            background: linear-gradient(135deg, #ff9ecb 0%, #ffe27a 50%, #8fe3ff 100%);
-            color: #4a3b5c;
+            background: radial-gradient(circle at 50% 45%, rgba(255,211,77,.25), transparent 60%), linear-gradient(135deg, #6b2a9f 0%, #b03a8e 50%, #3ec9d5 100%);
+            color: #f3e6ff;
         }
 
         .card-emblem {
@@ -199,21 +227,21 @@
         .card-label {
             font-size: 16px;
             letter-spacing: 4px;
-            color: #4a3b5c;
-            background: rgba(255, 255, 255, 0.7);
+            color: #2a0745;
+            background: rgba(255, 255, 255, 0.85);
             padding: 2px 12px;
             border-radius: 999px;
         }
 
         .card-stars {
             font-size: 14px;
-            color: #ff5da2;
+            color: #ff6fc1;
             letter-spacing: 6px;
         }
 
         /* めくった後：引いたカードの絵柄 */
         .tarot-card-back {
-            background: #fff;
+            background: rgba(38, 10, 66, .85);
             transform: rotateY(180deg);
             padding: 0;
         }
@@ -236,14 +264,14 @@
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            color: #ff5da2;
+            background: rgba(28, 6, 51, 0.92);
+            color: #ffd7f0;
             padding: 5px 14px;
             border-radius: 999px;
             font-size: 15px;
             white-space: nowrap;
-            border: 2px solid #ff6fae;
-            box-shadow: 0 2px 8px rgba(74, 59, 92, 0.25);
+            border: 2px solid #ff4fa8;
+            box-shadow: 0 2px 10px rgba(0,0,0,.5);
         }
 
         /* 占い説明 */
@@ -253,13 +281,13 @@
         }
 
         .fortune-intro h2 {
-            color: #ff5da2;
+            color: #ff6fc1;
             font-size: 1.8em;
             margin-bottom: 15px;
         }
 
         .fortune-intro p {
-            color: #6b5b7e;
+            color: #d9c2f0;
             font-size: 1.05em;
             line-height: 1.6;
         }
@@ -270,15 +298,15 @@
             padding: 20px;
             font-size: 1.3em;
             font-weight: bold;
-            border: 3px solid #4a3b5c;
+            border: 3px solid rgba(255,255,255,.35);
             border-radius: 999px;
             cursor: pointer;
             transition: all 0.2s ease;
             margin: 20px 0;
             color: white;
             text-shadow: 1px 1px 0 rgba(74, 59, 92, 0.3);
-            background: linear-gradient(135deg, #ff6fae 0%, #ffc93d 50%, #4ecdc4 100%);
-            box-shadow: 6px 6px 0 rgba(74, 59, 92, 0.25);
+            background: linear-gradient(135deg, #ff4fa8 0%, #ffd34d 50%, #3ec9d5 100%);
+            box-shadow: 6px 6px 0 rgba(255, 79, 168, 0.45);
             letter-spacing: 1px;
         }
 
@@ -305,7 +333,7 @@
 
         .result-title {
             font-size: 2.5em;
-            color: #ff5da2;
+            color: #ff6fc1;
             margin: 20px 0;
             font-weight: bold;
             letter-spacing: 2px;
@@ -314,28 +342,28 @@
 
         .result-message {
             font-size: 1.1em;
-            color: #6b5b7e;
+            color: #d9c2f0;
             line-height: 1.8;
             margin: 20px 0;
-            background: #fff2f8;
+            background: rgba(255, 79, 168, .12);
             padding: 20px;
             border-radius: 18px;
-            border: 2px dashed #ff9ecb;
+            border: 2px dashed #ff8ecb;
         }
 
         .ai-analysis {
             text-align: left;
-            background: #eafcfa;
+            background: rgba(62, 201, 213, .14);
             padding: 20px;
             border-radius: 18px;
             margin: 20px 0;
-            border: 2px dashed #4ecdc4;
+            border: 2px dashed #3ec9d5;
             font-size: 0.95em;
             line-height: 1.7;
         }
 
         .ai-label {
-            color: #00a89b;
+            color: #7ff0e6;
             font-weight: bold;
             font-size: 0.9em;
             margin-bottom: 10px;
@@ -345,16 +373,16 @@
         .luck-bar {
             width: 100%;
             height: 30px;
-            background: #fff;
+            background: rgba(255,255,255,.15);
             border-radius: 999px;
             overflow: hidden;
             margin: 20px 0;
-            border: 3px solid #4a3b5c;
+            border: 3px solid rgba(255,255,255,.35);
         }
 
         .luck-fill {
             height: 100%;
-            background: repeating-linear-gradient(45deg, #ff6fae 0 14px, #ffc93d 14px 28px, #4ecdc4 28px 42px, #a78bfa 42px 56px);
+            background: repeating-linear-gradient(45deg, #ff4fa8 0 14px, #ffd34d 14px 28px, #3ec9d5 28px 42px, #a78bfa 42px 56px);
             border-radius: 999px;
             animation: fillBar 1.5s ease-out;
         }
@@ -391,16 +419,16 @@
         }
 
         .cta-section h3 {
-            color: #ff5da2;
+            color: #ff6fc1;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
 
         .btn-cta {
-            background: #fff;
-            color: #ff5da2;
+            background: rgba(38, 10, 66, .9);
+            color: #ffd7f0;
             padding: 12px 25px;
-            border: 3px solid #ff6fae;
+            border: 3px solid #ff4fa8;
             border-radius: 999px;
             font-size: 1em;
             cursor: pointer;
@@ -427,7 +455,7 @@
 
 
         /* PR枠 */
-        .ad-area{max-width:700px;width:calc(100% - 36px);margin:30px auto 0;padding:24px 20px 10px;text-align:center;border-top:1px solid rgba(255,111,174,.3);position:relative}
+        .ad-area{max-width:700px;width:calc(100% - 36px);margin:30px auto 0;padding:24px 20px 10px;text-align:center;border-top:1px solid rgba(255,79,168,.4);position:relative}
         .ad-label{display:inline-block;margin-bottom:14px;padding:2px 12px;border:1px solid rgba(255,111,174,.5);border-radius:20px;color:#ff5da2;font-size:.7em;letter-spacing:.2em}
         .ad-banner{display:flex;flex-wrap:wrap;justify-content:center;gap:16px}
         .ad-banner a{display:inline-block;line-height:0;border-radius:8px;overflow:hidden;transition:opacity .25s ease}
@@ -479,6 +507,11 @@
     <div class="decoration decoration3">🔮</div>
     <div class="decoration decoration4">⭐</div>
 
+    <!-- メインビジュアル -->
+    <div class="pop-hero">
+        <img src="images/pop-hero.jpg" alt="AIタロットであなたの未来をPOPに占う｜占い師POP" loading="eager">
+    </div>
+
     <!-- ヘッダー -->
     <header>
         <h1>🌈 <span class="title-grad">AI占い</span> 🌈</h1>
@@ -524,22 +557,22 @@
                 <div class="result-area" id="tarotResult">
                     <div class="result-title" id="tarotCardName">魔術師</div>
                     <p style="color: #a78bfa; font-size: 0.95em; margin-bottom: 12px; font-weight: bold;" id="tarotKeyword">I. The Magician</p>
-                    <p id="tarotPosition" style="display: inline-block; padding: 5px 18px; border: 2px solid #4ecdc4; border-radius: 999px; font-size: 0.95em; font-weight: bold; color: #00a89b; background: #eafcfa; margin-bottom: 15px;">正位置</p>
+                    <p id="tarotPosition" style="display: inline-block; padding: 5px 18px; border: 2px solid #3ec9d5; border-radius: 999px; font-size: 0.95em; font-weight: bold; color: #7ff0e6; background: rgba(62, 201, 213, .14); margin-bottom: 15px;">正位置</p>
 
                     <div class="result-message" id="tarotCardMeaning">
                         このカードはあなたの創造力と可能性を表しています。
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
-                        <div style="background: #fff9e3; padding: 15px; border-radius: 18px; border: 2px dashed #ffc93d;">
+                        <div style="background: rgba(255, 211, 77, .12); padding: 15px; border-radius: 18px; border: 2px dashed #ffd34d;">
                             <div class="ai-label" style="color: #e8a400;">☀️ 正位置の意味</div>
-                            <div style="color: #6b5b7e; font-size: 0.95em; line-height: 1.6; margin-top: 8px;" id="tarotPositive">
+                            <div style="color: #d9c2f0; font-size: 0.95em; line-height: 1.6; margin-top: 8px;" id="tarotPositive">
                                 新しい始まり、意志の力
                             </div>
                         </div>
-                        <div style="background: #f3edff; padding: 15px; border-radius: 18px; border: 2px dashed #a78bfa;">
+                        <div style="background: rgba(167, 139, 250, .16); padding: 15px; border-radius: 18px; border: 2px dashed #b79cff;">
                             <div class="ai-label" style="color: #8a63f5;">🌙 逆位置の意味</div>
-                            <div style="color: #6b5b7e; font-size: 0.95em; line-height: 1.6; margin-top: 8px;" id="tarotNegative">
+                            <div style="color: #d9c2f0; font-size: 0.95em; line-height: 1.6; margin-top: 8px;" id="tarotNegative">
                                 躊躇や迷い、自信の欠如
                             </div>
                         </div>
@@ -547,14 +580,14 @@
 
                     <div class="ai-analysis">
                         <div class="ai-label">💡 アドバイス</div>
-                        <div id="tarotAdvice" style="color: #6b5b7e; font-size: 0.95em; line-height: 1.7;">
+                        <div id="tarotAdvice" style="color: #d9c2f0; font-size: 0.95em; line-height: 1.7;">
                             あなたの才能を信じて、今こそ行動を起こしましょう。
                         </div>
                     </div>
 
                     <div class="ai-analysis">
                         <div class="ai-label">🤖 AI深層分析</div>
-                        <div id="tarotAiAnalysis" style="color: #6b5b7e; font-size: 0.95em; line-height: 1.7;">
+                        <div id="tarotAiAnalysis" style="color: #d9c2f0; font-size: 0.95em; line-height: 1.7;">
                             現在のあなたは、新しいプロジェクトを始める最適なタイミングにあります。自信を持って前に進みましょう。
                         </div>
                     </div>
@@ -576,31 +609,31 @@
                 </div>
 
                 <div style="margin: 20px 0;">
-                    <label style="color: #ff5da2; display: block; margin-bottom: 10px; font-weight: bold;">あなたの生年月日</label>
-                    <input type="date" id="fortuneBirthDate" style="width: 100%; padding: 12px; border-radius: 999px; border: 3px solid #ff9ecb; background: #fff; color: #4a3b5c; font-size: 1.05em;">
+                    <label style="color: #ff6fc1; display: block; margin-bottom: 10px; font-weight: bold;">あなたの生年月日</label>
+                    <input type="date" id="fortuneBirthDate" style="width: 100%; padding: 12px; border-radius: 999px; border: 3px solid #ff4fa8; background: rgba(20, 4, 38, .9); color: #ffd7f0; font-size: 1.05em;">
                 </div>
 
                 <button class="btn-fortune" onclick="showFortune()">🎯 運勢を診断する</button>
 
                 <div class="result-area" id="fortuneResult">
-                    <div style="background: #fff2f8; border: 3px solid #ff9ecb; border-radius: 22px; padding: 25px; margin-bottom: 25px;">
-                        <p style="color: #ff5da2; font-size: 0.9em; letter-spacing: 2px; margin-bottom: 8px; font-weight: bold;">🌟 あなたの運命タイプ</p>
-                        <p style="color: #ff5da2; font-size: 2em; font-weight: bold; text-shadow: 2px 2px 0 #ffe27a;" id="typeName">金の太陽座</p>
-                        <p style="color: #6b5b7e; font-size: 1.05em; margin: 8px 0 20px; font-weight: bold;" id="typeCatch">〜情熱のリーダー〜</p>
+                    <div style="background: rgba(255, 79, 168, .12); border: 3px solid #ff4fa8; border-radius: 22px; padding: 25px; margin-bottom: 25px;">
+                        <p style="color: #ff6fc1; font-size: 0.9em; letter-spacing: 2px; margin-bottom: 8px; font-weight: bold;">🌟 あなたの運命タイプ</p>
+                        <p style="color: #ff6fc1; font-size: 2em; font-weight: bold; text-shadow: 2px 2px 0 #ffe27a;" id="typeName">金の太陽座</p>
+                        <p style="color: #d9c2f0; font-size: 1.05em; margin: 8px 0 20px; font-weight: bold;" id="typeCatch">〜情熱のリーダー〜</p>
 
                         <div class="ai-analysis">
                             <div class="ai-label">👤 あなたの性格</div>
-                            <div id="typePersonality" style="color: #6b5b7e; font-size: 0.95em; line-height: 1.7;"></div>
+                            <div id="typePersonality" style="color: #d9c2f0; font-size: 0.95em; line-height: 1.7;"></div>
                         </div>
 
                         <div class="ai-analysis">
                             <div class="ai-label">⚡ エネルギーの流れ</div>
-                            <div id="typeStyle" style="color: #6b5b7e; font-size: 0.95em; line-height: 1.7;"></div>
+                            <div id="typeStyle" style="color: #d9c2f0; font-size: 0.95em; line-height: 1.7;"></div>
                         </div>
 
                         <div class="ai-analysis">
                             <div class="ai-label">🗓️ 2026年のあなたの運勢</div>
-                            <div id="typeYear" style="color: #6b5b7e; font-size: 0.95em; line-height: 1.7;"></div>
+                            <div id="typeYear" style="color: #d9c2f0; font-size: 0.95em; line-height: 1.7;"></div>
                         </div>
                     </div>
 
@@ -609,33 +642,33 @@
 
                     <div style="text-align: center; margin: 20px 0;">
                         <p style="font-size: 3em; margin: 20px 0;">✨</p>
-                        <h3 style="color: #6b5b7e; margin-bottom: 15px;">総合運勢スコア</h3>
+                        <h3 style="color: #d9c2f0; margin-bottom: 15px;">総合運勢スコア</h3>
                         <div class="luck-bar">
                             <div class="luck-fill" id="fortuneLuckFill"></div>
                         </div>
-                        <p style="color: #ff5da2; font-size: 1.8em; font-weight: bold;" id="fortuneScore">95/100</p>
+                        <p style="color: #ff6fc1; font-size: 1.8em; font-weight: bold;" id="fortuneScore">95/100</p>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
-                        <div style="background: #f3edff; padding: 15px; border-radius: 18px; border: 2px dashed #a78bfa;">
+                        <div style="background: rgba(167, 139, 250, .16); padding: 15px; border-radius: 18px; border: 2px dashed #b79cff;">
                             <p style="color: #8a63f5; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;">💼 仕事運</p>
                             <p style="color: #ff9a3d; font-size: 1.8em; font-weight: bold;" id="workLuck">⭐⭐⭐</p>
-                            <p style="color: #6b5b7e; font-size: 0.85em; line-height: 1.6; margin-top: 8px; text-align: left;" id="workComment"></p>
+                            <p style="color: #d9c2f0; font-size: 0.85em; line-height: 1.6; margin-top: 8px; text-align: left;" id="workComment"></p>
                         </div>
-                        <div style="background: #fff2f8; padding: 15px; border-radius: 18px; border: 2px dashed #ff9ecb;">
-                            <p style="color: #ff5da2; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;">💕 恋愛運</p>
+                        <div style="background: rgba(255, 79, 168, .12); padding: 15px; border-radius: 18px; border: 2px dashed #ff8ecb;">
+                            <p style="color: #ff6fc1; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;">💕 恋愛運</p>
                             <p style="color: #ff9a3d; font-size: 1.8em; font-weight: bold;" id="loveLuck">⭐⭐⭐</p>
-                            <p style="color: #6b5b7e; font-size: 0.85em; line-height: 1.6; margin-top: 8px; text-align: left;" id="loveComment"></p>
+                            <p style="color: #d9c2f0; font-size: 0.85em; line-height: 1.6; margin-top: 8px; text-align: left;" id="loveComment"></p>
                         </div>
-                        <div style="background: #fff9e3; padding: 15px; border-radius: 18px; border: 2px dashed #ffc93d;">
+                        <div style="background: rgba(255, 211, 77, .12); padding: 15px; border-radius: 18px; border: 2px dashed #ffd34d;">
                             <p style="color: #e8a400; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;">💰 金運</p>
                             <p style="color: #ff9a3d; font-size: 1.8em; font-weight: bold;" id="moneyLuck">⭐⭐⭐</p>
-                            <p style="color: #6b5b7e; font-size: 0.85em; line-height: 1.6; margin-top: 8px; text-align: left;" id="moneyComment"></p>
+                            <p style="color: #d9c2f0; font-size: 0.85em; line-height: 1.6; margin-top: 8px; text-align: left;" id="moneyComment"></p>
                         </div>
-                        <div style="background: #eafcfa; padding: 15px; border-radius: 18px; border: 2px dashed #4ecdc4;">
-                            <p style="color: #00a89b; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;">💪 健康運</p>
+                        <div style="background: rgba(62, 201, 213, .14); padding: 15px; border-radius: 18px; border: 2px dashed #3ec9d5;">
+                            <p style="color: #7ff0e6; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;">💪 健康運</p>
                             <p style="color: #ff9a3d; font-size: 1.8em; font-weight: bold;" id="healthLuck">⭐⭐⭐</p>
-                            <p style="color: #6b5b7e; font-size: 0.85em; line-height: 1.6; margin-top: 8px; text-align: left;" id="healthComment"></p>
+                            <p style="color: #d9c2f0; font-size: 0.85em; line-height: 1.6; margin-top: 8px; text-align: left;" id="healthComment"></p>
                         </div>
                     </div>
 
@@ -644,40 +677,40 @@
                     </div>
 
                     <div style="margin: 25px 0;">
-                        <h3 style="color: #ff5da2; margin-bottom: 15px; text-align: center;">🍀 今日のラッキーポイント</h3>
+                        <h3 style="color: #ff6fc1; margin-bottom: 15px; text-align: center;">🍀 今日のラッキーポイント</h3>
                         <div class="lucky-grid">
-                            <div style="background: #fff2f8; padding: 15px 10px; border-radius: 18px; border: 2px solid #ff9ecb; text-align: center;">
-                                <p style="color: #ff5da2; font-size: 0.85em; margin-bottom: 8px; font-weight: bold;">🎨 ラッキーカラー</p>
-                                <p style="color: #4a3b5c; font-size: 1.1em; font-weight: bold;" id="luckyColor">ゴールド</p>
+                            <div style="background: rgba(255, 79, 168, .12); padding: 15px 10px; border-radius: 18px; border: 2px solid #ff9ecb; text-align: center;">
+                                <p style="color: #ff6fc1; font-size: 0.85em; margin-bottom: 8px; font-weight: bold;">🎨 ラッキーカラー</p>
+                                <p style="color: #f3e6ff; font-size: 1.1em; font-weight: bold;" id="luckyColor">ゴールド</p>
                             </div>
-                            <div style="background: #fff9e3; padding: 15px 10px; border-radius: 18px; border: 2px solid #ffc93d; text-align: center;">
+                            <div style="background: rgba(255, 211, 77, .12); padding: 15px 10px; border-radius: 18px; border: 2px solid #ffc93d; text-align: center;">
                                 <p style="color: #e8a400; font-size: 0.85em; margin-bottom: 8px; font-weight: bold;">🔑 ラッキーアイテム</p>
-                                <p style="color: #4a3b5c; font-size: 1.1em; font-weight: bold;" id="luckyItem">腕時計</p>
+                                <p style="color: #f3e6ff; font-size: 1.1em; font-weight: bold;" id="luckyItem">腕時計</p>
                             </div>
-                            <div style="background: #eafcfa; padding: 15px 10px; border-radius: 18px; border: 2px solid #4ecdc4; text-align: center;">
-                                <p style="color: #00a89b; font-size: 0.85em; margin-bottom: 8px; font-weight: bold;">🔢 ラッキーナンバー</p>
-                                <p style="color: #4a3b5c; font-size: 1.1em; font-weight: bold;" id="luckyNumber">7</p>
+                            <div style="background: rgba(62, 201, 213, .14); padding: 15px 10px; border-radius: 18px; border: 2px solid #3ec9d5; text-align: center;">
+                                <p style="color: #7ff0e6; font-size: 0.85em; margin-bottom: 8px; font-weight: bold;">🔢 ラッキーナンバー</p>
+                                <p style="color: #f3e6ff; font-size: 1.1em; font-weight: bold;" id="luckyNumber">7</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="ai-analysis">
                         <div class="ai-label">💡 今日の行動アドバイス</div>
-                        <div id="fortuneAdvice" style="color: #6b5b7e; font-size: 0.95em; line-height: 1.7;">
+                        <div id="fortuneAdvice" style="color: #d9c2f0; font-size: 0.95em; line-height: 1.7;">
                             今日は新しいことに挑戦するのに最適な日です。
                         </div>
                     </div>
 
                     <div class="ai-analysis">
                         <div class="ai-label">🤖 AI詳細分析</div>
-                        <div id="fortuneAiAnalysis" style="color: #6b5b7e; font-size: 0.95em; line-height: 1.7;">
+                        <div id="fortuneAiAnalysis" style="color: #d9c2f0; font-size: 0.95em; line-height: 1.7;">
                             今日のあなたは最高のエネルギーに満ちています。新しいチャレンジに最適な日です。
                         </div>
                     </div>
 
-                    <div class="ai-analysis" style="background: #fff9e3; border-color: #ffc93d;">
+                    <div class="ai-analysis" style="background: rgba(255, 211, 77, .12); border-color: #ffc93d;">
                         <div class="ai-label" style="color: #e8a400;">⚠️ 今日の注意点</div>
-                        <div id="fortuneCaution" style="color: #6b5b7e; font-size: 0.95em; line-height: 1.7;">
+                        <div id="fortuneCaution" style="color: #d9c2f0; font-size: 0.95em; line-height: 1.7;">
                             調子が良い時ほど、足元をすくわれないよう気をつけましょう。
                         </div>
                     </div>
@@ -698,13 +731,13 @@
                 </div>
 
                 <div style="margin: 20px 0;">
-                    <label style="color: #ff5da2; display: block; margin-bottom: 10px; font-weight: bold;">あなたの生年月日</label>
-                    <input type="date" id="birthDate1" style="width: 100%; padding: 10px; border-radius: 999px; border: 3px solid #ff9ecb; background: #fff; color: #4a3b5c;">
+                    <label style="color: #ff6fc1; display: block; margin-bottom: 10px; font-weight: bold;">あなたの生年月日</label>
+                    <input type="date" id="birthDate1" style="width: 100%; padding: 10px; border-radius: 999px; border: 3px solid #ff4fa8; background: rgba(20, 4, 38, .9); color: #ffd7f0;">
                 </div>
 
                 <div style="margin: 20px 0;">
-                    <label style="color: #ff5da2; display: block; margin-bottom: 10px; font-weight: bold;">相手の生年月日</label>
-                    <input type="date" id="birthDate2" style="width: 100%; padding: 10px; border-radius: 999px; border: 3px solid #ff9ecb; background: #fff; color: #4a3b5c;">
+                    <label style="color: #ff6fc1; display: block; margin-bottom: 10px; font-weight: bold;">相手の生年月日</label>
+                    <input type="date" id="birthDate2" style="width: 100%; padding: 10px; border-radius: 999px; border: 3px solid #ff4fa8; background: rgba(20, 4, 38, .9); color: #ffd7f0;">
                 </div>
 
                 <button class="btn-fortune" onclick="showCompatibility()">💕 相性を診断</button>
@@ -721,7 +754,7 @@
 
                     <div class="ai-analysis">
                         <div class="ai-label">🤖 AI相性分析</div>
-                        <div id="compatibilityAiAnalysis" style="color: #6b5b7e;">
+                        <div id="compatibilityAiAnalysis" style="color: #d9c2f0;">
                             二人の関係は非常に相性が良いです。互いに補い合える素晴らしいパートナーシップが期待できます。
                         </div>
                     </div>
@@ -902,7 +935,7 @@
             posEl.textContent = posLabel;
             posEl.style.color = reversed ? '#8a63f5' : '#00a89b';
             posEl.style.borderColor = reversed ? '#a78bfa' : '#4ecdc4';
-            posEl.style.background = reversed ? '#f3edff' : '#eafcfa';
+            posEl.style.background = reversed ? 'rgba(167,139,250,.16)' : 'rgba(62,201,213,.14)';
 
             document.getElementById('tarotCardMeaning').textContent = reversed ? card.rev : card.up;
             document.getElementById('tarotPositive').textContent = card.up;
