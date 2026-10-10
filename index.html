@@ -353,6 +353,58 @@
             color: #3ec9d5;
         }
 
+        .share-box {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed #ff8ecb;
+            text-align: center;
+        }
+
+        .share-label {
+            color: #ff6fc1;
+            font-weight: bold;
+            font-size: 0.95em;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            padding: 10px 24px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 0.95em;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform .2s ease, box-shadow .2s ease;
+            font-family: inherit;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .share-x {
+            background: #000;
+            color: #fff;
+            box-shadow: 3px 3px 0 rgba(255, 255, 255, .25), 0 0 0 2px #fff inset;
+        }
+
+        .share-line {
+            background: #06c755;
+            color: #fff;
+            box-shadow: 3px 3px 0 rgba(6, 199, 85, .35);
+        }
+
         .btn-fortune:active {
             transform: translateY(2px);
             box-shadow: 2px 2px 0 rgba(74, 59, 92, 0.25);
@@ -631,6 +683,14 @@
                     </div>
 
                     <p class="next-draw" id="tarotNextDraw"></p>
+
+                    <div class="share-box">
+                        <p class="share-label">✨ 結果をシェアする</p>
+                        <div class="share-buttons">
+                            <button type="button" class="share-btn share-x" onclick="shareToX(buildTarotShareText())">𝕏 で投稿</button>
+                            <button type="button" class="share-btn share-line" onclick="shareToLine(buildTarotShareText())">LINEで送る</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -751,6 +811,14 @@
                         </div>
                     </div>
 
+                    <div class="share-box">
+                        <p class="share-label">✨ 結果をシェアする</p>
+                        <div class="share-buttons">
+                            <button type="button" class="share-btn share-x" onclick="shareToX(buildFortuneShareText())">𝕏 で投稿</button>
+                            <button type="button" class="share-btn share-line" onclick="shareToLine(buildFortuneShareText())">LINEで送る</button>
+                        </div>
+                    </div>
+
                     <div class="cta-section">
                         <button class="btn-cta" onclick="showFortune()">🔄 もう一度診断する</button>
                     </div>
@@ -827,6 +895,32 @@
 <script src="daily-color.js"></script>
     <script src="tarot-data.js"></script>
     <script>
+        // SNSシェア機能
+        const SHARE_SITE_URL = 'https://xn--n8jynmau7p684r.net/';
+
+        function shareToX(text) {
+            const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(SHARE_SITE_URL);
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+
+        function shareToLine(text) {
+            const url = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(SHARE_SITE_URL) + '&text=' + encodeURIComponent(text);
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+
+        function buildTarotShareText() {
+            const name = document.getElementById('tarotCardName').textContent.trim();
+            const pos = document.getElementById('tarotPosition').textContent.trim();
+            return '🔮 AIタロット占いで「' + name + '」（' + pos + '）が出ました！\n#AI占い';
+        }
+
+        function buildFortuneShareText() {
+            const type = document.getElementById('typeName').textContent.trim();
+            const title = document.getElementById('fortuneTitle').textContent.trim();
+            const score = document.getElementById('fortuneScore').textContent.trim();
+            return '✨ 今日の運勢診断（' + type + '）の結果は「' + title + '」、運勢スコア' + score + 'でした！\n#AI占い';
+        }
+
         // タロットカードデータ（全78枚）は tarot-data.js で定義
 
         // 運勢データ
