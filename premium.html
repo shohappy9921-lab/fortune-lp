@@ -604,14 +604,14 @@ function shareToLine(text) {
 function buildTarotShareText() {
   const name = document.getElementById('tarotCardName').textContent.trim();
   const pos = document.getElementById('tarotPosition').textContent.trim();
-  return '【星読みの館ルナ】🌙 タロット占いで「' + name + '」（' + pos + '）が出ました！\n#AI占い';
+  return '【星読みの館ルナ】（無料）\n🌙 タロット占いで「' + name + '」（' + pos + '）が出ました！\n#AI占い';
 }
 
 function buildFortuneShareText() {
   const type = document.getElementById('typeName').textContent.trim();
   const title = document.getElementById('fortuneTitle').textContent.trim();
   const score = document.getElementById('fortuneScore').textContent.trim();
-  return '【星読みの館ルナ】✧ 今日の運勢（' + type + '）の結果は「' + title + '」、運勢スコア' + score + 'でした！\n#AI占い';
+  return '【星読みの館ルナ】（無料）\n✧ 今日の運勢（' + type + '）の結果は「' + title + '」、運勢スコア' + score + 'でした！\n#AI占い';
 }
 
 /* ===== 星の生成 ===== */
