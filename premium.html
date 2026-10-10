@@ -239,6 +239,13 @@ body{
 .next-draw b{color:var(--gold);font-weight:600}
 .btn-main:disabled{opacity:.45;cursor:default;filter:grayscale(.35)}
 .btn-main:disabled:hover{transform:none;box-shadow:none}
+.share-box{margin-top:25px;padding-top:20px;border-top:1px solid rgba(212,175,55,.2);text-align:center}
+.share-label{color:var(--gold-light);font-size:.9em;letter-spacing:.12em;margin-bottom:12px}
+.share-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.share-btn{padding:10px 24px;border-radius:4px;font-weight:600;font-size:.9em;letter-spacing:.08em;cursor:pointer;border:1px solid transparent;display:inline-flex;align-items:center;gap:6px;transition:.3s;font-family:var(--serif)}
+.share-btn:hover{transform:translateY(-2px)}
+.share-x{background:#000;color:#fff;border-color:rgba(212,175,55,.5)}
+.share-line{background:#06c755;color:#fff}
 
 /* ===== フォーム ===== */
 .field{margin:22px 0}
@@ -415,6 +422,14 @@ footer .sig{color:var(--gold-dim);font-family:'Cormorant Garamond',serif;font-st
         </div>
 
         <p class="next-draw" id="tarotNextDraw"></p>
+
+        <div class="share-box">
+          <p class="share-label">✧ 結果をシェアする</p>
+          <div class="share-buttons">
+            <button type="button" class="share-btn share-x" onclick="shareToX(buildTarotShareText())">𝕏 で投稿</button>
+            <button type="button" class="share-btn share-line" onclick="shareToLine(buildTarotShareText())">LINEで送る</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -492,6 +507,14 @@ footer .sig{color:var(--gold-dim);font-family:'Cormorant Garamond',serif;font-st
           <div class="body" id="fortuneCaution"></div>
         </div>
 
+        <div class="share-box">
+          <p class="share-label">✧ 結果をシェアする</p>
+          <div class="share-buttons">
+            <button type="button" class="share-btn share-x" onclick="shareToX(buildFortuneShareText())">𝕏 で投稿</button>
+            <button type="button" class="share-btn share-line" onclick="shareToLine(buildFortuneShareText())">LINEで送る</button>
+          </div>
+        </div>
+
         <button class="btn-sub" onclick="showFortune()">もう一度視てもらう</button>
       </div>
     </div>
@@ -565,6 +588,32 @@ footer .sig{color:var(--gold-dim);font-family:'Cormorant Garamond',serif;font-st
 <script src="tarot-data.js"></script>
 <script src="fortune-data.js"></script>
 <script>
+/* ===== SNSシェア機能 ===== */
+const SHARE_SITE_URL = 'https://xn--n8jynmau7p684r.net/premium.html';
+
+function shareToX(text) {
+  const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(SHARE_SITE_URL);
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+function shareToLine(text) {
+  const url = 'https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(SHARE_SITE_URL) + '&text=' + encodeURIComponent(text);
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+function buildTarotShareText() {
+  const name = document.getElementById('tarotCardName').textContent.trim();
+  const pos = document.getElementById('tarotPosition').textContent.trim();
+  return '🌙 星読みの館ルナのタロット占いで「' + name + '」（' + pos + '）が出ました！\n#AI占い';
+}
+
+function buildFortuneShareText() {
+  const type = document.getElementById('typeName').textContent.trim();
+  const title = document.getElementById('fortuneTitle').textContent.trim();
+  const score = document.getElementById('fortuneScore').textContent.trim();
+  return '✧ 今日の運勢診断（' + type + '）の結果は「' + title + '」、運勢スコア' + score + 'でした！\n#AI占い';
+}
+
 /* ===== 星の生成 ===== */
 (function(){
   const w = document.getElementById('stars');
