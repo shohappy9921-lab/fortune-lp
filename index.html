@@ -911,14 +911,14 @@
         function buildTarotShareText() {
             const name = document.getElementById('tarotCardName').textContent.trim();
             const pos = document.getElementById('tarotPosition').textContent.trim();
-            return '【AI占い】🔮 AIタロット占いで「' + name + '」（' + pos + '）が出ました！\n#AI占い';
+            return '【AI占い】（無料）\n🔮 AIタロット占いで「' + name + '」（' + pos + '）が出ました！\n#AI占い';
         }
 
         function buildFortuneShareText() {
             const type = document.getElementById('typeName').textContent.trim();
             const title = document.getElementById('fortuneTitle').textContent.trim();
             const score = document.getElementById('fortuneScore').textContent.trim();
-            return '【AI占い】✨ 今日の運勢（' + type + '）の結果は「' + title + '」、運勢スコア' + score + 'でした！\n#AI占い';
+            return '【AI占い】（無料）\n✨ 今日の運勢（' + type + '）の結果は「' + title + '」、運勢スコア' + score + 'でした！\n#AI占い';
         }
 
         // タロットカードデータ（全78枚）は tarot-data.js で定義
